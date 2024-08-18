@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Company {
+  id                   Int     @id @default(autoincrement())
+  cnpj                 String  @unique
+  socialReason         String
+  fantasyName          String
+  tag                  String  @unique
+  city                 String?
+  number               String?
+  street               String?
+  complement           String?
+  district             String?
+  cep                  String?
+  phone                String?
+  email                String?
+  primaryDescription   String?
+  secondaryDescription String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
+
+  groups            Group[]
+  products          Product[]
+  ProductIngredient ProductIngredient[]
+  Neighborhood      Neighborhood[]
+}
+
+model Group {
+  id                     Int     @id @default(autoincrement())
+  companyId              Int
+  description            String
+  groupSearchDescription String
+  company                Company @relation(fields: [companyId], references: [id])
+  imageUrl               String?
+
+  products Product[]
+}
+
+model Product {
+  id                Int                 @id @default(autoincrement())
+  description       String
+  costValue         Float
+  saleValue         Float
+  popular           Boolean
+  groupId           Int
+  companyId         Int
+  imageUrl          String
+  group             Group               @relation(fields: [groupId], references: [id])
+  company           Company             @relation(fields: [companyId], references: [id])
+  ProductIngredient ProductIngredient[]
+}
+
+model ProductIngredient {
+  id          Int    @id @default(autoincrement())
+  productId   Int
+  companyId   Int
+  description String
+
+  product Product @relation(fields: [productId], references: [id])
+  company Company @relation(fields: [companyId], references: [id])
+}
+
+model Neighborhood {
+  id          Int    @id @default(autoincrement())
+  description String
+  companyId   Int
+  tax         Float
+
+  company Company @relation(fields: [companyId], references: [id])
+}
